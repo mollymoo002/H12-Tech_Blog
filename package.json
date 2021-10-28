@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/mollymoo002/H12-Tech_Blog#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "connect-session-sequelize": "^7.1.2",
     "dotenv": "^10.0.0",
     "express-session": "^1.17.2",
