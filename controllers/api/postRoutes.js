@@ -1,6 +1,64 @@
 const router = require('express').Router();
-const { Post } = require('../../models');
+const { Post, User, Comment } = require('../../models');
+const sequelize = require('../../config/connection');
 const withAuth = require('../../utils/auth');
+
+router.get('/', (req, res) => {
+  console.log('__________________');
+  try {
+    // Get all projects and JOIN with user data
+    const postData = await Post.findAll({
+      order: [
+        ['created_at', 'DESC']
+      ],
+      include: [
+        {
+          model: User
+        },
+        {
+          model: Comment,
+          include: {
+            model: User,
+            attributes: ['username']
+          }
+        },
+      ],
+    });
+
+     res.status(200).json(postData.reverse());
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+    const postData = await Post.findByPk(req.params.id, {
+      include: [
+        {
+          model: Comment,
+          include: {
+            model: User,
+            attributes: ['username']
+          }
+        },
+        {
+          model: User,
+          attributes: ['username']
+        }
+      ],
+    });
+    if (!postData) {
+      res.status(404).json({ message: 'No project found with this id!' });
+      return;
+    }
+    
+    res.status(200).json(postData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 
 router.post('/', withAuth, async (req, res) => {
   try {
@@ -10,6 +68,24 @@ router.post('/', withAuth, async (req, res) => {
     });
 
     res.status(200).json(newPost);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
+router.put('/:id', withAuth, async, (req, res) => {
+  try {
+    const updatePost = await Post.update(req.params.id, {
+      title: req.body.title,
+      content: req.body.content
+    })
+
+    if (!postData) {
+      res.status(404).json({ message: 'No project found with this id!' });
+      return;
+    }
+
+    res.status(200).json(postData);
   } catch (err) {
     res.status(400).json(err);
   }
