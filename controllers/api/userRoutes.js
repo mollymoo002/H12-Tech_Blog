@@ -1,5 +1,57 @@
 const router = require('express').Router();
-const { User } = require('../../models');
+const { User, Post } = require('../../models');
+
+router.get('/', (req, res) => {
+  console.log('__________________');
+  try {
+    // Get all projects and JOIN with user data
+    const userData = await User.findAll({
+      include: [
+        {
+          model: User,
+          attributes: {exclude: ['[password]'] }
+        },
+      ],
+    });
+
+     res.status(200).json(userData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get('/:id', (req, res) => {
+  console.log('__________________');
+  try {
+    // Get all projects and JOIN with user data
+    const userData = await User.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          attributes: {exclude: ['[password]'] }
+        },
+        {
+          model: Post,
+        },
+        {
+          model: Comment,
+          include: {
+            model: Post,
+            attributes: ['title']
+          }
+        },
+        {
+          model: Post,
+          attributes: ['title']
+        }
+      ],
+    });
+
+     res.status(200).json(userData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 router.post('/', async (req, res) => {
   try {
@@ -55,6 +107,42 @@ router.post('/logout', (req, res) => {
     });
   } else {
     res.status(404).end();
+  }
+});
+
+router.put('/:id', (req, res) => {
+  try {
+    const updateUser = await User.update(req.params.id, {
+      username: req.body.username
+    })
+
+    if (!userData) {
+      res.status(404).json({ message: 'No user found with this id!' });
+      return;
+    }
+
+    res.status(200).json(userData);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
+router.delete('/:id', withAuth, async (req, res) => {
+  try {
+    const userData = await User.destroy({
+      where: {
+        id: req.params.id
+      },
+    });
+
+    if (!userData) {
+      res.status(404).json({ message: 'No user found with this id!' });
+      return;
+    }
+
+    res.status(200).json(userData);
+  } catch (err) {
+    res.status(500).json(err);
   }
 });
 
