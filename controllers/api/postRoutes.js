@@ -6,7 +6,6 @@ const withAuth = require('../../utils/auth');
 router.get('/', async (req, res) => {
   console.log('__________________');
   try {
-    // Get all projects and JOIN with user data
     const postData = await Post.findAll({
       order: [
         ['created_at', 'DESC']
@@ -49,7 +48,7 @@ router.get('/:id', async (req, res) => {
       ],
     });
     if (!postData) {
-      res.status(404).json({ message: 'No project found with this id!' });
+      res.status(404).json({ message: 'No post found with this id!' });
       return;
     }
     
@@ -81,7 +80,7 @@ router.put('/:id', withAuth, async (req, res) => {
     })
 
     if (!postData) {
-      res.status(404).json({ message: 'No project found with this id!' });
+      res.status(404).json({ message: 'No post found with this id!' });
       return;
     }
 
@@ -101,7 +100,7 @@ router.delete('/:id', withAuth, async (req, res) => {
     });
 
     if (!postData) {
-      res.status(404).json({ message: 'No project found with this id!' });
+      res.status(404).json({ message: 'No post found with this id!' });
       return;
     }
 

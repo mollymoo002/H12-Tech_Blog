@@ -1,9 +1,3 @@
-<div class="row">
-  <div class="col-auto">
-    <h2>Welcome, {{name}}!</h2>
-  </div>
-</div>
-
   {{#if posts.length}}
   <div class="col-md-6 post-list">
     <h3>Current Posts:</h3>
@@ -14,6 +8,6 @@
   {{/if}}
 </div>
 
-<button type="submit" class="btn"><a href="/dashboard/new">New Post</a></button>
+<button type="submit" class="btn" id="new-post-form"><a href="/dashboard/new">New Post</a></button>
 
 <script src="/js/addPost.js"></script>

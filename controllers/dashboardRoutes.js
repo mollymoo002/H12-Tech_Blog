@@ -52,7 +52,7 @@ router.get('/', withAuth, async (req, res) => {
   
       const post = postData.get({ plain: true });
   
-      res.render('edit-post', {
+      res.render('editPost', {
         ...post,
         logged_in: true
       });
@@ -62,7 +62,7 @@ router.get('/', withAuth, async (req, res) => {
   });
 
   router.get('/new', (req, res) => {
-      res.render('new-post');
+      res.render('newPost');
   });
 
 module.exports = router;
