@@ -3,7 +3,7 @@ const { Post, User, Comment } = require('../../models');
 const sequelize = require('../../config/connection');
 const withAuth = require('../../utils/auth');
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   console.log('__________________');
   try {
     // Get all projects and JOIN with user data
@@ -73,7 +73,7 @@ router.post('/', withAuth, async (req, res) => {
   }
 });
 
-router.put('/:id', withAuth, async, (req, res) => {
+router.put('/:id', withAuth, async (req, res) => {
   try {
     const updatePost = await Post.update(req.params.id, {
       title: req.body.title,

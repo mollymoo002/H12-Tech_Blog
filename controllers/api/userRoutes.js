@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const { User, Post } = require('../../models');
+const withAuth = require('../../utils/auth');
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   console.log('__________________');
   try {
     // Get all projects and JOIN with user data
@@ -20,7 +21,7 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   console.log('__________________');
   try {
     // Get all projects and JOIN with user data
@@ -100,7 +101,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/logout', (req, res) => {
+router.post('/logout', async (req, res) => {
   if (req.session.logged_in) {
     req.session.destroy(() => {
       res.status(204).end();
@@ -110,7 +111,7 @@ router.post('/logout', (req, res) => {
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const updateUser = await User.update(req.params.id, {
       username: req.body.username

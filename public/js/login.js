@@ -35,8 +35,7 @@ const loginFormHandler = async (event) => {
       });
   
       if (response.ok) {
-        document.location.replace('/signup');
-        alert("Please verify your info")
+        document.location.replace('/');
       } else {
         alert(response.statusText,  "Please fill out the entire form!");
       }
