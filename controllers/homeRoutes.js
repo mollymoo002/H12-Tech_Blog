@@ -4,19 +4,29 @@ const router = require('express').Router();
 
 router.get('/', async (req, res) => {
   try {
-    const postData = await Post.findAll({
-      include: [
-        {
-          model: User
-        },
-        {
-          model: Comment
-        },
+    const findPosts = await Post.findAll({
+      attributes: [
+        'id',
+        'title',
+        'content',
+        'created_at'
       ],
-    });
-
+      include: [{
+        model: Comment,
+        attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+        include: [{
+          model: User,
+          attributes: ['username']
+        }]
+      },
+      {
+        model: User,
+        attributes: ['username']
+      }
+      ]
+    })
     // Serialize data so the template can read it
-    const posts = postData.map((post) => post.get({ plain: true }));
+    const posts = findPosts.map((post) => post.get({ plain: true }));
 
     // Pass serialized data and session flag into template
     res.render('homepage', { 
@@ -24,11 +34,12 @@ router.get('/', async (req, res) => {
       logged_in: req.session.logged_in 
     });
   } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
 });
 
-router.get('/login', async (req, res) => {
+router.get('/login', (req, res) => {
   // If the user is already logged in, redirect the request to another route
   if (req.session.logged_in) {
     res.redirect('/');
@@ -44,29 +55,45 @@ router.get('/signup', (req, res) => {
 
 router.get('/post/:id', async (req, res) => {
   try {
-    const postData = await Post.findByPk(req.params.id, {
-      include: [
-        {
-          model: Comment,
-          include: {
-            model: User,
-            attributes: ['username']
-          }
-        },
-        {
+    const postbyID = await Post.findOne({
+      where: {
+        id: req.params.id
+      },
+      attributes: [
+        'id',
+        'content',
+        'title',
+        'created_at'
+      ],
+      include: [{
+        model: Comment,
+        attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+        include: {
           model: User,
           attributes: ['username']
         }
-      ],
+      },
+      {
+        model: User,
+        attributes: ['username']
+      }
+    ]
     });
 
-    const post = postData.get({ plain: true });
+    const singlePost = await postbyID
+      if(!singlePost) {
+        res.status(404).json({ message: 'No post found with this id'});
+        return;
+      }
+      const post = singlePost.get({ plain: true});
+      console.log(post);
 
-    res.render('single-post', {
-      ...post,
-      logged_in: req.session.logged_in
-    });
+      res.render('single-post', {
+        post,
+        loggedIn: req.session.loggedIn
+      });
   } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
 });
