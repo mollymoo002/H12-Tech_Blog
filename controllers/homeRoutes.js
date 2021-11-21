@@ -100,26 +100,40 @@ router.get('/post/:id', async (req, res) => {
 
 router.get('/post-comments', async (req, res) => {
   try {
-    const postData = await Post.findAll({
-      include: [
-        {
+    const findComment = await Post.findOne({
+      where: {
+        id: req.params.id
+      },
+      attributes: [
+        'id',
+        'content',
+        'title',
+        'created_at'
+      ],
+      include: [{
+        model: Comment,
+        attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+        include: {
           model: User,
           attributes: ['username']
-        },
-        {
-          model: Comment
-        },
-      ],
+        }
+      },
+      {
+        model: User,
+        attributes: ['username']
+      }
+    ]
     });
 
-    // Serialize data so the template can read it
-    const posts = postData.map((post) => post.get({ plain: true }));
+    const findNewComment = await findComment
+    if(!findNewComment) {
+      res.status(404).json({ message: 'No post found with this id'});
+      return
+    }
 
-    // Pass serialized data and session flag into template
-    res.render('post-comments', { 
-      posts, 
-      logged_in: req.session.logged_in 
-    });
+    const post =  findNewComment.get({ plain: true});
+
+    res.render('posts-comments', { post, loggedIn: req.session.loggedIn});
   } catch (err) {
     res.status(500).json(err);
   }
